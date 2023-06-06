@@ -15,7 +15,7 @@
   - name: Deploy Portainer
     community.docker.docker_container:
       name: portainer
-      image: "docker.io/portainer/portainer-be"
+      image: "docker.io/portainer/portainer-ee"
       ports:
         - "9443:9443"
       volumes:
