@@ -1,0 +1,24 @@
+---
+- hosts: all
+  
+  become: yes
+  become_user: "{{ lookup('env','USER') }}"
+  tasks:
+  #creating directory
+  - name: create localhost directory
+    file:
+      path: $HOME/portainer
+      state: directory
+  # Deploy Portainer
+  # --
+  #   
+  - name: Deploy Portainer
+    community.docker.docker_container:
+      name: portainer
+      image: "docker.io/portainer/portainer-be"
+      ports:
+        - "9443:9443"
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /home/dawid/portainer:/data
+      restart_policy: always
