@@ -9,32 +9,16 @@
       upgrade: yes
       update_cache: yes
       cache_valid_time: 3600
-  # Install Docker
-  # --
-  # 
-  - name: Add signing key
-    ansible.builtin.apt_key:
-      url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
-      state: present
-
-  - name: Add repository into sources list
-    ansible.builtin.apt_repository:
-      repo: "deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
-      state: present
-      filename: docker  
-
-  - name: Install Docker
-        ansible.builtin.apt:
-          name:
-            - docker
-            - docker.io
-            - docker-compose
-            - docker-registry
-          state: latest
-          update_cache: true
-
-  - name: add user permissions
-    shell: "usermod -aG docker {{ ansible_env.SUDO_USER }}"
-
-  - name: Reset ssh connection for changes to take effect
-    meta: "reset_connection"
+    
+  - name: Install pre-reqs for Docker and Ansible
+    apt: name={{ item }} state=latest update_cache=yes
+    loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+  - name: Add the GPG key for Docker
+    shell: 'curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg'
+  - name: Add the repository to fetch the docker package
+    shell: 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian bullseye stable" | tee /etc/apt/sources.list.d/docker.list'
+  - name: Update source list and then install docker
+    apt: update_cache=yes name=docker-ce state=latest
+  - name: Install the Docker module for Python, required by ansible
+    pip:
+      name: docker
