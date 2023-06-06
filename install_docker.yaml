@@ -6,10 +6,10 @@
   # update repo
   - name: update packages
     apt:
+      update: yes
       upgrade: yes
       update_cache: yes
-      cache_valid_time: 3600
-    
+          
   - name: Install pre-reqs for Docker and Ansible
     apt: name={{ item }} state=latest update_cache=yes
     loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
